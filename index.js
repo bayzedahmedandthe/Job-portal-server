@@ -27,8 +27,19 @@ async function run() {
 
         // All job api--
 
+        app.post("/jobs", async(req, res) => {
+            const jobData = req.body;
+            const result = await jobsCollections.insertOne(jobData);
+            res.send(result);
+        })
+
         app.get("/jobs", async (req, res) => {
-            const cursor = jobsCollections.find();
+            const email = req.query.email;
+            let query = {};
+            if(email){
+                query = {hr_email: email}
+            }
+            const cursor = jobsCollections.find(query);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -56,14 +67,23 @@ async function run() {
                 console.log(application.job_id);
                 const query1 = { _id: new ObjectId(application.job_id) }
                 const job = await jobsCollections.findOne(query1)
-                if(job){
+                if (job) {
                     application.title = job.title;
                     application.company = job.company;
                     application.location = job.location;
                     application.company_logo = job.company_logo;
                     application.category = job.category
+                    application.jobType = job.jobType
                 }
             }
+            res.send(result);
+        })
+
+        app.delete("/job_applications/:id", async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: new ObjectId(id) }
+            const result = await applicationCollections.deleteOne(query);
             res.send(result);
         })
 
