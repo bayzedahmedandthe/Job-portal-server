@@ -34,13 +34,18 @@ async function run() {
         })
 
         app.get("/jobs", async (req, res) => {
+            const cursor = jobsCollections.find().limit(5);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get("/alljobs", async(req, res) => {
             const email = req.query.email;
             let query = {};
             if(email){
                 query = {hr_email: email}
             }
-            const cursor = jobsCollections.find(query);
-            const result = await cursor.toArray();
+            const cursor = jobsCollections.find();
+            const  result = await cursor.toArray();
             res.send(result);
         })
 
